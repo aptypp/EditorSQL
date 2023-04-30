@@ -1,10 +1,8 @@
-﻿using System;
-
-namespace EditorSQL.Models
+﻿namespace EditorSQL.Models
 {
     public class Note
     {
-        public int? Id { get; set; }
+        public int Id { get; set; }
         public string Content { get; set; }
 
         public Note()

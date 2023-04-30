@@ -20,11 +20,13 @@ namespace EditorSQL.ViewModels
         private readonly EditorModel _model;
         private readonly NotesContext _notesContext;
 
+        private const string _CONNECTION_STRING =
+            "Server=localhost;Database=notes;Trusted_Connection=True;TrustServerCertificate=True";
+
         public EditorViewModel()
         {
             _model = new EditorModel();
-            _notesContext = new NotesContext(
-                "Server=localhost;Database=notes;Trusted_Connection=True;TrustServerCertificate=True");
+            _notesContext = new NotesContext(_CONNECTION_STRING);
         }
 
         ~EditorViewModel()

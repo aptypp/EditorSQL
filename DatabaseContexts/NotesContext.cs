@@ -6,7 +6,7 @@ namespace EditorSQL.DatabaseContexts
 {
     public class NotesContext : DataBaseContext
     {
-        public DbSet<Note> Notes { get; set; }
+        public DbSet<Note> Notes { get; }
         public NotesContext(string connectionString) : base(connectionString) { }
     }
 }
