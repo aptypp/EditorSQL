@@ -24,10 +24,9 @@
         </Grid.ColumnDefinitions>
 
         <TextBlock Name="DataBaseOutput" Grid.RowSpan="2" VerticalAlignment="Stretch"
-                   Text="{Binding databaseData, UpdateSourceTrigger=PropertyChanged}">
+                   Text="{Binding DatabaseDataText, UpdateSourceTrigger=PropertyChanged}">
         </TextBlock>
-
-
+        
         <GroupItem Grid.Row="1" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="10">
             <Grid>
                 <Grid.RowDefinitions>

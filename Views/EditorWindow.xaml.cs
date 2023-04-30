@@ -16,7 +16,6 @@ namespace EditorSQL.Views
         private void PushButtonOnClick(object sender, RoutedEventArgs e)
         {
             _context.PushData(InputField.Text);
-            _context.PullData();
 
             InputField.Text = string.Empty;
         }

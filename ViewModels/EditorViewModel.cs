@@ -1,97 +1,58 @@
-﻿using System.ComponentModel;
-using System.Runtime.CompilerServices;
+﻿using System.Linq;
+using EditorSQL.DatabaseContexts;
 using EditorSQL.Models;
-using Microsoft.Data.SqlClient;
 
 namespace EditorSQL.ViewModels
 {
-    public sealed class EditorViewModel : INotifyPropertyChanged
+    public sealed class EditorViewModel : ViewModel
     {
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        public string databaseData
+        public string DatabaseDataText
         {
-            get => _model.databaseData;
+            get => _model.DatabaseText;
             private set
             {
-                if (value == _model.databaseData) return;
-                _model.databaseData = value;
+                if (value == _model.DatabaseText) return;
+                _model.DatabaseText = value;
                 OnPropertyChanged();
             }
         }
 
         private readonly EditorModel _model;
-        private readonly SqlConnection _sqlConnection;
+        private readonly NotesContext _notesContext;
 
         public EditorViewModel()
         {
             _model = new EditorModel();
-            _sqlConnection = ConnectToDataBase();
+            _notesContext = new NotesContext(
+                "Server=localhost;Database=notes;Trusted_Connection=True;TrustServerCertificate=True");
         }
 
         ~EditorViewModel()
         {
-            _sqlConnection.Dispose();
+            _notesContext.Dispose();
         }
 
         public void PullData()
         {
-            string query = "SELECT * FROM things";
+            _model.Notes = _notesContext.Notes.ToList();
 
-            string newData = string.Empty;
+            string newDataText = string.Empty;
 
-            SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
-
-            using SqlConnection connection =
-                new SqlConnection(
-                    "Server=localhost;Database=notes;Trusted_Connection=True;TrustServerCertificate=True");
-            connection.Open();
-
-            using SqlCommand command = new SqlCommand(query, connection);
-            using SqlDataReader reader = command.ExecuteReader();
-
-            while (reader.Read())
+            for (int noteIndex = 0; noteIndex < _model.Notes.Count; noteIndex++)
             {
-                newData += reader.GetString(0) + "\n";
+                Note note = _model.Notes[noteIndex];
+                newDataText += $"{note.Id}_{note.Content}\n";
             }
 
-            databaseData = newData;
-
-            connection.Close();
+            DatabaseDataText = newDataText;
         }
 
         public void PushData(string data)
         {
-            string query = $"INSERT INTO things (Content) values (@Value)";
-
-            using SqlConnection connection =
-                new SqlConnection(
-                    "Server=localhost;Database=notes;Trusted_Connection=True;TrustServerCertificate=True");
-            connection.Open();
-
-            using SqlCommand command = new SqlCommand(query, connection);
-
-            command.Parameters.AddWithValue("@Value", data);
-
-            command.ExecuteNonQuery();
-
-            connection.Close();
-        }
-
-        private SqlConnection ConnectToDataBase()
-        {
-            SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
-
-            builder.DataSource = "<ARTUR>";
-            builder.InitialCatalog = "<notes>";
-            builder.IntegratedSecurity = true;
-
-            return new SqlConnection(builder.ConnectionString);
-        }
-
-        private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            Note newNote = new Note(_model.Notes.Count, data);
+            _notesContext.Notes.Add(newNote);
+            _notesContext.SaveChanges();
+            _model.Notes.Add(newNote);
         }
     }
 }
